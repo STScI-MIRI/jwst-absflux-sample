@@ -1,0 +1,15 @@
+# min/max sensitivities for JWST absflux observations
+# taken 16-Mar-2018 from
+# https://outerspace.stsci.edu/display/JWSTCC/AbsFlux+Instrument+Sensitivities
+#
+# inst   mmode   band    wave  full_min full_max sub_max
+NIRCAM   IMAGE   F070W    0.7  1.83e-3   0.51   108.
+NIRCAM   IMAGE   F090W    0.9  1.16e-3   0.28    59.
+NIRSPEC  IFU     1.3um    1.2  1.5       200.    -1.
+NIRSPEC  S1600A1 1.3um    1.3  1.5       200.   930.
+NIRISS   SOSSo1  0.8um    0.8  1.7       691.  1350.
+NIRISS   WFSS    F090W   0.91  0.2       5.4     57.
+MIRI     IMAGE   F560W    5.6  4.09       -1    29.9
+MIRI     MRS     12.0um  11.5  22.5     5.06e3   -1.
+MIRI     LRS-S   12.0um  12.0  0.5       7.90    -1.
+MIRI     LRS-SL  12.0um  12.5  2.62     116.     -1.
