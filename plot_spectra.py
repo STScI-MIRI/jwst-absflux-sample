@@ -55,6 +55,81 @@ def initialize_parser():
     return parser
 
 
+def which_observable(modewave, modemin, modemax,
+                     starnames, starwaves, starfluxes):
+    """
+    Determine which stars can be observed in this mode
+
+    Parameters
+    ----------
+    modewave : float
+        wavelength of mode
+
+    modemin, modemax: floats
+        min/max fluxes observable in this mode
+
+    starnames: list of strings
+        names of the stars
+
+    starwaves, starfluxes: dict of wave/flux vectors
+        models of the star fluxes
+
+    Returns
+    -------
+    obsnames : list of str
+        names of the stars that are observable in this mode
+    """
+    obsstars = []
+    for cname in starnames:
+        modeflux = np.interp([modewave], starwaves[cname], starfluxes[cname])
+        if modemin <= modeflux <= modemax:
+            obsstars.append(cname)
+
+    return obsstars
+
+
+def which_modes(mmvals,
+                starnames, starwaves, starfluxes):
+    """
+    Determine which modes are observable by which star
+
+    Parameters
+    ----------
+    mmvals : astropy Table
+        mode min/max info
+
+    starnames: list of strings
+        names of the stars
+
+    starwaves, starfluxes: dict of wave/flux vectors
+        models of the star fluxes
+
+    Returns
+    -------
+    starmodes, starmodes_num: tuple of dicts
+        dictonary by starname giving the modes and number observable
+    """
+    starmodes = {}
+    starmodes_num = {}
+    for k in range(len(mmvals)):
+        if mmvals['sub_max'][k] > 0:
+            bandmax = mmvals['sub_max'][k]
+        else:
+            bandmax = mmvals['full_max'][k]
+        obsnames = which_observable(mmvals['wave'][k], mmvals['full_min'][k],
+                                    bandmax,
+                                    starnames, starwaves, starfluxes)
+        for cname in obsnames:
+            modeid = (mmvals['inst'][k], mmvals['mmode'][k], mmvals['band'][k])
+            if cname not in starmodes.keys():
+                starmodes[cname] = []
+                starmodes_num[cname] = 0
+            starmodes[cname].append(modeid)
+            starmodes_num[cname] += 1
+
+    return (starmodes, starmodes_num)
+
+
 if __name__ == '__main__':
 
     parser = initialize_parser()
@@ -63,6 +138,10 @@ if __name__ == '__main__':
     astarnames = ['1802271', '1812095', 'bd60d1753']
     gstarnames = ['p330e', 'p177d', 'snap2']
     wdstarnames = ['g191b2b', 'gd71', 'gd153']
+    allstarnames = astarnames + gstarnames + wdstarnames
+    # allstarnames = astarnames
+
+    target_num_obs = 3
 
     xsize = 15.0
     ysize = 9.0
@@ -72,7 +151,7 @@ if __name__ == '__main__':
 
     starfluxes = {}
     starwaves = {}
-    for cname in np.concatenate((astarnames, gstarnames, wdstarnames)):
+    for cname in allstarnames:
         cfile = glob.glob("data/%s_mod_0??.fits" % cname)
         rb_filename = cfile[0].replace('.fits', '_r3000.fits')
         ctable = Table.read(rb_filename)
@@ -97,10 +176,82 @@ if __name__ == '__main__':
         starfluxes[cname] = flux_mJy
         starwaves[cname] = x
 
-    # plot the min/max sensitivites
+    # read in the min/max sensitivities for all the modes
     mmvals = Table.read('jwst_inst_sens.dat',
                         format='ascii.commented_header',
                         header_start=-1)
+
+    # create a dictionary with all keys for all the modes
+    #   using a tuple of (inst, mmode, band) as the key
+    mo_keys = zip(mmvals['inst'], mmvals['mmode'], mmvals['band'])
+    modeobserved = {}
+    modeobservedstars = {}
+    modedone = {}
+    for cmode in mo_keys:
+        modeobserved[cmode] = 0
+        modeobservedstars[cmode] = []
+        modedone[cmode] = False
+
+    # for each stars determine the modes and number observable
+    indxs = list(range(len(mmvals)))
+    cstarnames = allstarnames.copy()
+    cstarwaves = starwaves.copy()
+    cstarfluxes = starfluxes.copy()
+    obsstarlist = []
+    while True:
+        starmodes, sm_num = which_modes(mmvals[indxs],
+                                        cstarnames, cstarwaves, cstarfluxes)
+        # get the starname with the most observed modes
+        sname = ''
+        maxobs = 0
+        for cname in sm_num.keys():
+            if sm_num[cname] > maxobs:
+                sname = cname
+                maxobs = sm_num[cname]
+
+        # stop if no star covers the remaining modes
+        if sname == '':
+            break
+
+        # add this star to the list for observations
+        obsstarlist.append(sname)
+
+        # tabulate that all the modes for this stars have one more obs
+        for cur_mokey in starmodes[sname]:
+            modeobserved[cur_mokey] += 1
+            modeobservedstars[cur_mokey].append(sname)
+        # remove the star from the possible stars list
+        # sn_k, = np.where(cstarnames == sname)
+        for k in range(len(cstarnames)):
+            if sname == cstarnames[k]:
+                sn_k = k
+        del cstarnames[sn_k]
+        del cstarwaves[sname]
+        del cstarfluxes[sname]
+
+        # check the list of modes, remove a mode if it has the target number
+        for cur_mokey in modeobserved:
+            if (modeobserved[cur_mokey] >= target_num_obs):
+                if not modedone[cur_mokey]:
+                    modedone[cur_mokey] = True
+                    cinst, cmmode, cband = cur_mokey
+                    dindxs, = np.where((mmvals['inst'] == cinst)
+                                       & (mmvals['mmode'] == cmmode)
+                                       & (mmvals['band'] == cband))
+                    dindxs2, = np.where(dindxs[0] == indxs)
+                    del indxs[dindxs2[0]]
+
+        # stop if no stars left
+        if len(cstarnames) <= 0:
+            break
+
+    mo_keys = zip(mmvals['inst'], mmvals['mmode'], mmvals['band'])
+    for ckey in mo_keys:
+        print(ckey, modeobserved[ckey], modeobservedstars[ckey])
+
+    print(obsstarlist)
+
+    # plot the min/max sensitivites
     uinst = np.unique(mmvals['inst'])
     ctype = {'NIRCAM': 'c', 'NIRSPEC': 'm',
              'NIRISS': 'y', 'MIRI': 'k'}
