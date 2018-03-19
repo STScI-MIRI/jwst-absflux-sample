@@ -1,10 +1,7 @@
 from __future__ import (absolute_import, print_function, division)
 
 import glob
-import argparse
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import rc
 
 from astropy.table import Table, Column
 
@@ -26,10 +23,10 @@ def save_rebin_file(in_file, out_file, rebin_fac):
     indxs, = np.where((x > 0.6) & (x < 29.))
     x = x[indxs]
     delta = x[1:] - x[0:-1]
-    #print(x)
-    #print(x[1:]/delta)
+    # print(x)
+    # print(x[1:]/delta)
     print(np.mean(x[1:]/delta))
-    #exit()
+    # exit()
 
     rb_table['WAVELENGTH'] = Column(trunc_rebin(ctable['WAVELENGTH']*1e-4,
                                                 rebin_fac),
@@ -40,7 +37,8 @@ def save_rebin_file(in_file, out_file, rebin_fac):
     rb_table['FLUX'] = Column(trunc_rebin(ctable['FLUX'], rebin_fac),
                               description='flux')
     if 'CONTINUUM' in rb_table.colnames:
-        rb_table['CONTINUUM'] = Column(trunc_rebin(ctable['CONTINUUM'], rebin_fac),
+        rb_table['CONTINUUM'] = Column(trunc_rebin(ctable['CONTINUUM'],
+                                                   rebin_fac),
                                        description='continuum')
     rb_table.write(out_file, overwrite=True)
 

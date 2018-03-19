@@ -102,31 +102,31 @@ if __name__ == '__main__':
                         format='ascii.commented_header',
                         header_start=-1)
     uinst = np.unique(mmvals['inst'])
-    ctype = {'NIRCAM' : 'c', 'NIRSPEC' : 'm',
-             'NIRISS' : 'y', 'MIRI' : 'k'}
-    ptype = {'NIRCAM' : 'solid', 'NIRSPEC' : 'dashed',
-             'NIRISS' : 'dotted', 'MIRI' : 'dashdot'}
+    ctype = {'NIRCAM': 'c', 'NIRSPEC': 'm',
+             'NIRISS': 'y', 'MIRI': 'k'}
+    ptype = {'NIRCAM': 'solid', 'NIRSPEC': 'dashed',
+             'NIRISS': 'dotted', 'MIRI': 'dashdot'}
     for cinst in uinst:
         iindxs, = np.where(mmvals['inst'] == cinst)
         umode = np.unique(mmvals['mmode'][iindxs])
         for cmode in umode:
             mindxs, = np.where(mmvals['mmode'][iindxs] == cmode)
             for k in mindxs:
-                l = iindxs[k]
-                bandname = mmvals['band'][l]
-                bandmin = mmvals['full_min'][l]
-                if mmvals['sub_max'][l] > 0:
-                    bandmax = mmvals['sub_max'][l]
+                ll = iindxs[k]
+                bandname = mmvals['band'][ll]
+                bandmin = mmvals['full_min'][ll]
+                if mmvals['sub_max'][ll] > 0:
+                    bandmax = mmvals['sub_max'][ll]
                 else:
-                    bandmax = mmvals['full_max'][l]
-                cwave = mmvals['wave'][l]
+                    bandmax = mmvals['full_max'][ll]
+                cwave = mmvals['wave'][ll]
                 cax.plot([cwave, cwave],
                          np.array([bandmax, bandmin])*cwave**2,
                          color=ctype[cinst], linestyle=ptype[cinst],
                          linewidth=2.)
 
     cax.set_xscale('log')
-    cax.set_xlim(0.6,29.0)
+    cax.set_xlim(0.6, 29.0)
     cax.set_yscale('log')
     # cax.set_ylim(a_yrange)
     cax.set_ylabel("$\lambda^2 F(nu)$ [mJy $\mu m^2$]")
