@@ -52,6 +52,18 @@ def initialize_parser():
     parser.add_argument('-s', '--savefig', action='store',
                         default=False, choices=ftypes,
                         help='Save figure to a file')
+    parser.add_argument('--astars', help='Use A star models',
+                        action='store_true')
+    parser.add_argument('--gstars', help='Use G star models',
+                        action='store_true')
+    parser.add_argument('--wdstars', help='Use WD star models',
+                        action='store_true')
+    parser.add_argument('--primeonly', action='store_true',
+                        help='Only use prime designated sources')
+    parser.add_argument('--secondonly', action='store_true',
+                        help='Only use secondary designated sources')
+    parser.add_argument("-t", "--target_obs", metavar=int, default=3,
+                        help="number of target observations per mode")
     return parser
 
 
@@ -136,12 +148,30 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     astarnames = ['1802271', '1812095', 'bd60d1753']
-    gstarnames = ['p330e', 'p177d', 'snap2']
-    wdstarnames = ['g191b2b', 'gd71', 'gd153']
-    allstarnames = astarnames + gstarnames + wdstarnames
-    # allstarnames = astarnames
+    gstarnames_prime = ['p330e', 'p177d']
+    gstarnames_second = ['hd159222', 'hd205905', 'hd106252',
+                         'hd37962', 'hd209458', 'hd38949',
+                         'snap2', 'c26202', 'sf1615_001a']
+    if args.primeonly:
+        gstarnames = gstarnames_prime
+    elif args.secondonly:
+        gstarnames = gstarnames_second
+    else:
+        gstarnames = gstarnames_prime + gstarnames_second
 
-    target_num_obs = 3
+    wdstarnames = ['g191b2b', 'gd71', 'gd153',
+                   'lds749b', 'wd1057_719', 'wd1657_343']
+    allstarnames = []
+    if args.astars:
+        allstarnames += astarnames
+    if args.gstars:
+        allstarnames += gstarnames
+    if args.wdstars:
+        allstarnames += wdstarnames
+    if len(allstarnames) == 0:
+        allstarnames = astarnames + gstarnames + wdstarnames
+
+    target_num_obs = int(args.target_obs)
 
     xsize = 15.0
     ysize = 9.0

@@ -15,19 +15,23 @@ def trunc_rebin(x, rfac):
     return bin_ndarray(x, (int(len(x)/rfac), ), operation='mean')
 
 
-def save_rebin_file(in_file, out_file, rebin_fac):
-    ctable = Table.read(in_file)
-
+def get_spec_waveres(ctable):
     # check wavelength grid
     x = ctable['WAVELENGTH']*1e-4
     indxs, = np.where((x > 0.6) & (x < 29.))
     x = x[indxs]
     delta = x[1:] - x[0:-1]
-    # print(x)
-    # print(x[1:]/delta)
-    print(np.mean(x[1:]/delta))
-    # exit()
+    return np.mean(x[1:]/delta)
 
+
+def save_rebin_file(in_file, out_file, target_waveres):
+    ctable = Table.read(in_file)
+
+    actual_waveres = get_spec_waveres(ctable)
+    rebin_fac = int(actual_waveres/target_waveres)
+    print('actual: ', rebin_fac, actual_waveres)
+
+    rb_table = Table()
     rb_table['WAVELENGTH'] = Column(trunc_rebin(ctable['WAVELENGTH']*1e-4,
                                                 rebin_fac),
                                     description='wavelength [microns]',
@@ -46,24 +50,18 @@ def save_rebin_file(in_file, out_file, rebin_fac):
 if __name__ == '__main__':
 
     astarnames = ['1802271', '1812095', 'bd60d1753']
-    gstarnames = ['p330e', 'p177d', 'snap2']
-    wdstarnames = ['g191b2b', 'gd71', 'gd153']
+    gstarnames_prime = ['p330e', 'p177d']
+    gstarnames_second = ['hd159222', 'hd205905', 'hd106252',
+                         'hd37962', 'hd209458', 'hd38949',
+                         'snap2', 'c26202', 'sf1615_001a']
+    gstarnames = gstarnames_prime + gstarnames_second
+    wdstarnames = ['g191b2b', 'gd71', 'gd153',
+                   'lds749b', 'wd1057_719', 'wd1657_343']
 
-    # rebin to a resolution of 3000
-    # a and g star models at R=300,000 and wavelength grid at R=300,000
+    # rebin to a resolution of 3000, wavelength grid res of 6000
     rfac = 50
-    rb_table = Table()
-    for cname in np.concatenate((astarnames, gstarnames)):
+    for cname in np.concatenate((astarnames, gstarnames, wdstarnames)):
         print(cname)
         cfile = glob.glob("data/%s_mod_0??.fits" % cname)
         rb_filename = cfile[0].replace('.fits', '_r3000.fits')
-        save_rebin_file(cfile[0], rb_filename, rfac)
-    # wd star models at R=30,000 and wavelength grid of R=60,000
-    rfac = 10
-    rb_table = Table()
-    for cname in wdstarnames:
-        print(cname)
-        rb_table = Table()
-        cfile = glob.glob("data/%s_mod_0??.fits" % cname)
-        rb_filename = cfile[0].replace('.fits', '_r3000.fits')
-        save_rebin_file(cfile[0], rb_filename, rfac)
+        save_rebin_file(cfile[0], rb_filename, 6000.0)
