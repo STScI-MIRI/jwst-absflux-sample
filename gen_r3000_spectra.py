@@ -6,6 +6,9 @@ import numpy as np
 from astropy.table import Table, Column
 
 from rebin_ndarray import bin_ndarray
+from jwst_starnames import (astarnames_prime, astarnames_second,
+                            gstarnames_prime, gstarnames_second,
+                            wdstarnames_prime, wdstarnames_second)
 
 
 def trunc_rebin(x, rfac):
@@ -49,14 +52,9 @@ def save_rebin_file(in_file, out_file, target_waveres):
 
 if __name__ == '__main__':
 
-    astarnames = ['1802271', '1812095', 'bd60d1753']
-    gstarnames_prime = ['p330e', 'p177d']
-    gstarnames_second = ['hd159222', 'hd205905', 'hd106252',
-                         'hd37962', 'hd209458', 'hd38949',
-                         'snap2', 'c26202', 'sf1615_001a']
+    astarnames = astarnames_prime + astarnames_second
     gstarnames = gstarnames_prime + gstarnames_second
-    wdstarnames = ['g191b2b', 'gd71', 'gd153',
-                   'lds749b', 'wd1057_719', 'wd1657_343']
+    wdstarnames = wdstarnames_prime + wdstarnames_second
 
     # rebin to a resolution of 3000, wavelength grid res of 6000
     rfac = 50

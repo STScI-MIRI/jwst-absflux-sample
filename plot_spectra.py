@@ -9,6 +9,9 @@ from matplotlib import rc
 from astropy.table import Table
 from astropy import units as u
 
+from jwst_starnames import (astarnames_prime, astarnames_second,
+                            gstarnames_prime, gstarnames_second,
+                            wdstarnames_prime, wdstarnames_second)
 
 FNU = u.erg / (u.cm**2 * u.s * u.Hz)
 FLAM = u.erg / (u.cm**2 * u.s * u.AA)
@@ -147,20 +150,19 @@ if __name__ == '__main__':
     parser = initialize_parser()
     args = parser.parse_args()
 
-    astarnames = ['1802271', '1812095', 'bd60d1753']
-    gstarnames_prime = ['p330e', 'p177d']
-    gstarnames_second = ['hd159222', 'hd205905', 'hd106252',
-                         'hd37962', 'hd209458', 'hd38949',
-                         'snap2', 'c26202', 'sf1615_001a']
     if args.primeonly:
+        astarnames = astarnames_prime
         gstarnames = gstarnames_prime
+        wdstarnames = wdstarnames_prime
     elif args.secondonly:
+        astarnames = astarnames_second
         gstarnames = gstarnames_second
+        wdstarnames = wdstarnames_second
     else:
+        astarnames = astarnames_prime + astarnames_second
         gstarnames = gstarnames_prime + gstarnames_second
+        wdstarnames = wdstarnames_prime + wdstarnames_second
 
-    wdstarnames = ['g191b2b', 'gd71', 'gd153',
-                   'lds749b', 'wd1057_719', 'wd1657_343']
     allstarnames = []
     if args.astars:
         allstarnames += astarnames
