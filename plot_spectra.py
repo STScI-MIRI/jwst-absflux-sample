@@ -65,6 +65,8 @@ def initialize_parser():
                         help='Only use prime designated sources')
     parser.add_argument('--secondonly', action='store_true',
                         help='Only use secondary designated sources')
+    parser.add_argument('--part1', action='store_true',
+                        help='Only check the part1 limited set of modes')
     parser.add_argument("-t", "--target_obs", metavar=int, default=3,
                         help="number of target observations per mode")
     return parser
@@ -208,8 +210,12 @@ if __name__ == '__main__':
         starfluxes[cname] = flux_mJy
         starwaves[cname] = x
 
-    # read in the min/max sensitivities for all the modes
-    mmvals = Table.read('jwst_inst_sens.dat',
+    # read in the min/max sensitivities for the modes
+    if args.part1:
+        sens_filename = 'jwst_inst_sens_part1.dat'
+    else:
+        sens_filename = 'jwst_inst_sens.dat'
+    mmvals = Table.read(sens_filename,
                         format='ascii.commented_header',
                         header_start=-1)
 
@@ -277,11 +283,15 @@ if __name__ == '__main__':
         if len(cstarnames) <= 0:
             break
 
-    mo_keys = zip(mmvals['inst'], mmvals['mmode'], mmvals['band'])
-    for ckey in mo_keys:
-        print(ckey, modeobserved[ckey], modeobservedstars[ckey])
-
+    print('star list')
     print(obsstarlist)
+
+    mo_keys = zip(mmvals['inst'], mmvals['mmode'], mmvals['band'])
+    print('%8s  %8s  %8s  %2s  %s' % ('Inst', 'MMode', 'Band', '#', 'stars'))
+    for ckey in mo_keys:
+        print('%8s  %8s  %8s  %2i' % (ckey[0], ckey[1], ckey[2],
+                                      modeobserved[ckey]),
+              modeobservedstars[ckey])
 
     # plot the min/max sensitivites
     uinst = np.unique(mmvals['inst'])
@@ -318,7 +328,15 @@ if __name__ == '__main__':
     fig.tight_layout()
 
     # save the plot
-    basename = 'jwst_abscal_spec_'
+    basename = 'jwst_abscal_spec'
+    if args.astars:
+        basename += '_astars'
+    if args.gstars:
+        basename += '_gstars'
+    if args.wdstars:
+        basename += '_wdstars'
+    if args.part1:
+        basename += '_part1'
     if args.savefig:
         fig.savefig('%s.%s' % (basename, args.savefig))
     else:
