@@ -289,8 +289,8 @@ if __name__ == '__main__':
     mo_keys = zip(mmvals['inst'], mmvals['mmode'], mmvals['band'])
     print('%8s  %8s  %8s  %2s  %s' % ('Inst', 'MMode', 'Band', '#', 'stars'))
     for ckey in mo_keys:
-        print('%8s  %8s  %8s  %2i' % (ckey[0], ckey[1], ckey[2],
-                                      modeobserved[ckey]),
+        print('%8s,  %8s,  %8s,  %2i' % (ckey[0], ckey[1], ckey[2],
+                                         modeobserved[ckey]),
               modeobservedstars[ckey])
 
     # plot the min/max sensitivites

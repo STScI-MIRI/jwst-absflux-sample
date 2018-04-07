@@ -30,10 +30,12 @@ if __name__ == '__main__':
     # G stars
     gstarnames = ['hd146233', 'hd186427', 'hd142331',
                   'hd167060', 'hd115169', 'ngc2420',
-                  'ngc2506', 'ngc6811']
+                  'ngc2506', 'ngc6811',
+                  'gstark12.5', 'gstark13.0', 'gstark13.5', 'gstark14.0']
     gstarkmags = [3.99, 4.664, 7.125,
                   7.431, 7.707, 15.5,
-                  16.1, 13.9]
+                  16.1, 13.9,
+                  12.5, 13.0, 13.5, 14.0]
     template_star = 'hd159222'
     template_star_kmag = 5.05
     template_file = glob.glob("data/%s_mod_0??.fits" % template_star)
