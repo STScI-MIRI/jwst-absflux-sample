@@ -296,9 +296,9 @@ if __name__ == '__main__':
     # plot the min/max sensitivites
     uinst = np.unique(mmvals['inst'])
     ctype = {'NIRCAM': 'c', 'NIRSPEC': 'm',
-             'NIRISS': 'y', 'MIRI': 'k'}
+             'NIRISS': 'y', 'MIRI': 'k', 'FGS': 'b'}
     ptype = {'NIRCAM': 'solid', 'NIRSPEC': 'dashed',
-             'NIRISS': 'dotted', 'MIRI': 'dashdot'}
+             'NIRISS': 'dotted', 'MIRI': 'dashdot', 'FGS': 'dashdot'}
     for cinst in uinst:
         iindxs, = np.where(mmvals['inst'] == cinst)
         umode = np.unique(mmvals['mmode'][iindxs])
@@ -322,7 +322,7 @@ if __name__ == '__main__':
     cax.set_xlim(0.6, 29.0)
     cax.set_yscale('log')
     # cax.set_ylim(a_yrange)
-    cax.set_ylabel("$\lambda^2 F(nu)$ [mJy $\mu m^2$]")
+    cax.set_ylabel(r"$\lambda^2 F(nu)$ [mJy $\mu m^2$]")
     # cax.legend()
 
     fig.tight_layout()

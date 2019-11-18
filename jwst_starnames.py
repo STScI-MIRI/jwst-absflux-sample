@@ -14,7 +14,7 @@ gstarnames_prime = ['hd146233', 'hd186427', 'hd142331',
 gstarnames_second = ['hd159222', 'hd205905', 'hd106252',
                      'hd37962', 'hd209458', 'hd38949',
                      'snap2', 'c26202', 'sf1615_001a',
-                     'ngc2420', 'ngc2506', 'ngc6811']
+                     'ngc2420', 'ngc2506'] # , 'ngc6811']
 #                     'gstark12.5', 'gstark13.0', 'gstark13.5', 'gstark14.0']
 
 wdstarnames_prime = ['g191b2b', 'gd71', 'gd153']
