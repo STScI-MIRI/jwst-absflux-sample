@@ -246,6 +246,9 @@ if __name__ == '__main__':
             if sm_num[cname] > maxobs:
                 sname = cname
                 maxobs = sm_num[cname]
+            if cname == 'p330e':  # prioritize p330e
+                sname = cname
+                maxobs = 1000
 
         # stop if no star covers the remaining modes
         if sname == '':
