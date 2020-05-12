@@ -259,13 +259,15 @@ if __name__ == "__main__":
         sens_filename = "jwst_inst_sens_part1.dat"
     else:
         sens_filename = "jwst_inst_sens.dat"
-    mmvals = QTable.read(sens_filename, format="ascii.commented_header", header_start=-1)
+    mmvals = QTable.read(
+        sens_filename, format="ascii.commented_header", header_start=-1
+    )
 
     # add in the units
-    mmvals['wave'] *= u.micron
-    mmvals['full_min'] *= u.mJy
-    mmvals['full_max'] *= u.mJy
-    mmvals['sub_max'] *= u.mJy
+    mmvals["wave"] *= u.micron
+    mmvals["full_min"] *= u.mJy
+    mmvals["full_max"] *= u.mJy
+    mmvals["sub_max"] *= u.mJy
 
     # create a dictionary with all keys for all the modes
     #   using a tuple of (inst, mmode, band) as the key
@@ -284,10 +286,19 @@ if __name__ == "__main__":
     cstarwaves = starwaves.copy()
     cstarfluxes = starfluxes.copy()
     obsstarlist = []
+    sm_num_totposs = None
     while True:
         starmodes, sm_num = which_modes(
             mmvals[indxs], cstarnames, cstarwaves, cstarfluxes
         )
+        if sm_num_totposs is None:
+            sm_num_totposs = sm_num
+
+        # stars to prioritize
+        # fmt: off
+        priority_stars = ["p330e",
+                          "1743045", "1802271", "1812095"]
+        # fmt: on
         # get the starname with the most observed modes
         sname = ""
         maxobs = 0
@@ -295,7 +306,7 @@ if __name__ == "__main__":
             if sm_num[cname] > maxobs:
                 sname = cname
                 maxobs = sm_num[cname]
-            if cname == "p330e":  # prioritize p330e
+            if cname in priority_stars:
                 sname = cname
                 maxobs = 1000
 
@@ -339,6 +350,10 @@ if __name__ == "__main__":
 
     print("star list")
     print(obsstarlist)
+    pstr = ""
+    for cname in obsstarlist:
+        pstr += f"{cname} ({sm_num_totposs[cname]}) "
+    print(pstr)
 
     mo_keys = zip(mmvals["inst"], mmvals["mmode"], mmvals["band"])
     print("%8s  %8s  %8s  %2s  %s" % ("Inst", "MMode", "Band", "#", "stars"))
