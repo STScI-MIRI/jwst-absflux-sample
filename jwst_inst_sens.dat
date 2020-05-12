@@ -2,6 +2,7 @@
 # taken 20-Mar-2018 from
 # https://outerspace.stsci.edu/display/JWSTCC/AbsFlux+Instrument+Sensitivities
 #
+# wavelengths in micron, fluxes are in mJy
 # inst   mmode   band    wave  full_min full_max sub_max
 NIRCAM   IMAGE   F070W    0.7  1.83e-3   0.51   108.
 NIRCAM   IMAGE   F090W    0.9  1.16e-3   0.28    59.
@@ -39,6 +40,7 @@ NIRCAM   WFSS    3.7um   3.7   0.344     97.   3039.
 NIRCAM   WFSS    4.1um   4.1   0.435    123.   3860.
 NIRCAM   WFSS    4.5um   4.5   0.568    171.   5360.
 NIRCAM   WFSS    4.9um   4.9   0.949    293.   9197.
+NIRCAM   CORON   F187N   1.87  0.355     -1    3620.
 NIRSPEC  IFU2700  1.3um  1.2   2.2      138.     -1
 NIRSPEC  IFU2700  2.4um  2.4   1.6      123.     -1
 NIRSPEC  IFU2700  3.7um  3.7   1.8       98.     -1
