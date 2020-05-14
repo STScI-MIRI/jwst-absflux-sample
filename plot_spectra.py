@@ -297,6 +297,7 @@ if __name__ == "__main__":
         # stars to prioritize
         # fmt: off
         priority_stars = ["p330e",
+                          "gd71",
                           "1743045", "1802271", "1812095"]
         # fmt: on
         # get the starname with the most observed modes
