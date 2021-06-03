@@ -105,6 +105,11 @@ def initialize_parser():
         "--part1", action="store_true", help="Only check the part1 limited set of modes"
     )
     parser.add_argument(
+        "--inst", default="all",
+        choices=["all", "NIRCAM", "NIRSPEC", "NIRISS", "FGS", "MIRI"],
+        help="Instruments to plot"
+    )
+    parser.add_argument(
         "-t",
         "--target_obs",
         metavar=int,
@@ -238,7 +243,7 @@ if __name__ == "__main__":
         if cname in astarnames:
             col = "g"
         elif cname in gstarnames:
-            col = "r"
+            col = "m"
         elif cname in wdstarnames:
             col = "b"
 
@@ -248,7 +253,7 @@ if __name__ == "__main__":
         flux = ctable["FLUX"][indxs].quantity * FLAM
         flux_mJy = flux.to(u.mJy, u.spectral_density(x))
 
-        cax.plot(x, (x ** 2) * flux_mJy, col + "-", label=cname)
+        cax.plot(x, (x ** 2) * flux_mJy, col + "-", label=cname, alpha=0.25)
 
         # save star fluxes and wavelengths
         starfluxes[cname] = flux_mJy
@@ -365,7 +370,10 @@ if __name__ == "__main__":
         )
 
     # plot the min/max sensitivites
-    uinst = np.unique(mmvals["inst"])
+    if args.inst[0] == "all":
+        uinst = np.unique(mmvals["inst"])
+    else:
+        uinst = [args.inst]
     ctype = {"NIRCAM": "c", "NIRSPEC": "m", "NIRISS": "y", "MIRI": "k", "FGS": "b"}
     ptype = {
         "NIRCAM": "solid",
