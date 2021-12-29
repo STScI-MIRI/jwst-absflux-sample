@@ -15,15 +15,15 @@ from jwst_starnames import (
     astarnames_second,
     gstarnames_prime,
     gstarnames_second,
-    wdstarnames_prime,
-    wdstarnames_second,
+    hotstarnames_prime,
+    hotstarnames_second,
 )
 
 FNU = u.erg / (u.cm ** 2 * u.s * u.Hz)
 FLAM = u.erg / (u.cm ** 2 * u.s * u.AA)
 
 
-def set_params(lw=1.5, universal_color="#262626", fontsize=16):
+def set_params(lw=3, universal_color="#262626", fontsize=20):
     """Configure some matplotlib rcParams.
     Parameters
     ----------
@@ -45,11 +45,11 @@ def set_params(lw=1.5, universal_color="#262626", fontsize=16):
         axisbelow=True,
     )
     rc("image", origin="lower")
-    rc("xtick.major", width=lw * 0.75)
-    rc("xtick.minor", width=lw * 0.5)
+    rc("xtick.major", width=lw)
+    rc("xtick.minor", width=lw)
     rc("xtick", color=universal_color)
-    rc("ytick.major", width=lw * 0.75)
-    rc("ytick.minor", width=lw * 0.5)
+    rc("ytick.major", width=lw)
+    rc("ytick.minor", width=lw)
     rc("ytick", color=universal_color)
     rc("grid", linewidth=lw)
     rc(
@@ -58,7 +58,8 @@ def set_params(lw=1.5, universal_color="#262626", fontsize=16):
         numpoints=1,
         scatterpoints=1,
         handlelength=1.5,
-        fontsize=fontsize,
+        fontsize=0.7 * fontsize,
+        title_fontsize=0.8 * fontsize,
         columnspacing=1,
         handletextpad=0.75,
     )
@@ -92,24 +93,24 @@ def initialize_parser():
     )
     parser.add_argument("--astars", help="Use A star models", action="store_true")
     parser.add_argument("--gstars", help="Use G star models", action="store_true")
-    parser.add_argument("--wdstars", help="Use WD star models", action="store_true")
+    parser.add_argument("--hotstars", help="Use WD star models", action="store_true")
     parser.add_argument(
-        "--inst",
-        default="all",
-        choices=["all", "NIRCAM", "NIRSPEC", "NIRISS", "FGS", "MIRI"],
-        help="Instruments to plot",
+        "--fignum",
+        default="1",
+        choices=["1", "2"],
+        help="figure to plot",
     )
     return parser
 
 
-def plot_spec_singleinst(cax, inst, modes="all"):
+def plot_spec_singleinst(cax, inst, modes="all", fontsize=16, basealpha=0.25):
 
     cycle1_stars = [
         "1743045",
         "1802271",
         "1812095",
         "bd60d1753",
-        "hd002811",
+        "hd2811",
         "hd180609",
         "hd166205",
         "p330e",
@@ -131,7 +132,7 @@ def plot_spec_singleinst(cax, inst, modes="all"):
             col = "g-"
         elif cname in gstarnames:
             col = "m:"
-        elif cname in wdstarnames:
+        elif cname in hotstarnames:
             col = "b-."
 
         x = ctable["WAVELENGTH"].quantity
@@ -140,9 +141,9 @@ def plot_spec_singleinst(cax, inst, modes="all"):
         flux = ctable["FLUX"][indxs].quantity * FLAM
         flux_mJy = flux.to(u.mJy, u.spectral_density(x))
 
-        alpha = 0.25
+        alpha = basealpha
         if cname in cycle1_stars:
-            alpha = 0.75
+            alpha = basealpha
 
         cax.plot(x, (x ** 2) * flux_mJy, col, label=cname, alpha=alpha)
 
@@ -234,9 +235,10 @@ def plot_spec_singleinst(cax, inst, modes="all"):
                         cwave.value,
                         bandmax.value * cwave.value ** 2,
                         bandname,
-                        rotation=45.0,
-                        fontsize=9.0,
+                        rotation=90.0,
+                        fontsize=0.6 * fontsize,
                         horizontalalignment="center",
+                        bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5)
                     )
 
     cax.set_xscale("linear")
@@ -244,9 +246,12 @@ def plot_spec_singleinst(cax, inst, modes="all"):
     cax.set_yscale("log")
     cax.set_ylim(1e-4, 1e7)
     # cax.set_ylim(a_yrange)
-    cax.set_ylabel(r"$\lambda^2 F(\nu)$", fontsize=12)
+    cax.set_ylabel(r"$\lambda^2 F(\nu)$", fontsize=fontsize)
     # cax.set_ylabel(r"$\lambda^2 F(nu)$ [mJy $\mu m^2$]")
     # cax.legend()
+
+    cax.tick_params(axis='x', labelsize=fontsize)
+    cax.tick_params(axis='y', labelsize=fontsize)
 
 
 if __name__ == "__main__":
@@ -256,163 +261,181 @@ if __name__ == "__main__":
 
     astarnames = astarnames_prime + astarnames_second
     gstarnames = gstarnames_prime + gstarnames_second
-    wdstarnames = wdstarnames_prime + wdstarnames_second
+    hotstarnames = hotstarnames_prime + hotstarnames_second
 
     allstarnames = []
     if args.astars:
         allstarnames += astarnames
     if args.gstars:
         allstarnames += gstarnames
-    if args.wdstars:
-        allstarnames += wdstarnames
+    if args.hotstars:
+        allstarnames += hotstarnames
     if len(allstarnames) == 0:
-        allstarnames = astarnames + gstarnames + wdstarnames
+        allstarnames = astarnames + gstarnames + hotstarnames
 
-    xsize = 12.0
-    ysize = 14.0
-    fig, ax = plt.subplots(nrows=5, ncols=1, figsize=(xsize, ysize))
+    if args.fignum == "1":
+        xsize = 12.0
+        ysize = 10.0
+        nrows = 2
+    else:
+        xsize = 12.0
+        ysize = 15.0
+        nrows = 3
+    fig, ax = plt.subplots(nrows=nrows, ncols=1, figsize=(xsize, ysize))
     # xsize = 10.0
     # ysize = 18.0
     # fig, ax = plt.subplots(nrows=6, ncols=1, figsize=(xsize, ysize))
 
-    set_params(lw=1.0, fontsize=16)
+    lw = 2.5
+    fontsize = 16
+    set_params(lw=lw, fontsize=fontsize)
 
-    # cax = ax[0, 0]
-    cax = ax[3]
-    plot_spec_singleinst(cax, ["NIRCAM"], modes=["IMAGE"])
-    cax.set_ylim(1e-4, 1e6)
-    legend_elements = [
-        Line2D([0], [0], color="k", lw=2, linestyle="solid", label="WIDE"),
-        Line2D([0], [0], color="k", lw=2, linestyle="dashed", label="MEDIUM"),
-        Line2D([0], [0], color="k", lw=2, linestyle="dotted", label="NARROW"),
-    ]
-    cax.legend(
-        handles=legend_elements,
-        fontsize=10,
-        loc="lower right",
-        title="NIRCam IMAGE",
-        title_fontsize=11,
-    )
+    if args.fignum == "1":
+        # cax = ax[0, 0]
+        cax = ax[0]
+        plot_spec_singleinst(cax, ["NIRCAM"], modes=["IMAGE"], fontsize=fontsize)
+        cax.set_ylim(1e-4, 1e6)
+        legend_elements = [
+            Line2D([0], [0], color="k", lw=lw, linestyle="solid", label="WIDE"),
+            Line2D([0], [0], color="k", lw=lw, linestyle="dashed", label="MEDIUM"),
+            Line2D([0], [0], color="k", lw=lw, linestyle="dotted", label="NARROW"),
+        ]
+        cax.legend(
+            handles=legend_elements,
+            loc="lower right",
+            title="NIRCam IMAGE",
+        )
 
-    # cax = ax[1, 0]
-    # cax = ax[1]
-    # plot_spec_singleinst(cax, ["NIRCAM"], modes=["WFSS", "CORON"])
-    # legend_elements = [
-    #     Line2D([0], [0], color="k", lw=2, linestyle="solid", label="WFSS"),
-    #     Line2D([0], [0], color="k", lw=2, linestyle="dashed", label="CORON"),
-    # ]
-    # cax.legend(
-    #     handles=legend_elements,
-    #     fontsize=10,
-    #     loc="lower right",
-    #     title="NIRCam",
-    #     title_fontsize=11,
-    # )
+        # cax = ax[1, 0]
+        # cax = ax[1]
+        # plot_spec_singleinst(cax, ["NIRCAM"], modes=["WFSS", "CORON"])
+        # legend_elements = [
+        #     Line2D([0], [0], color="k", lw=lw, linestyle="solid", label="WFSS"),
+        #     Line2D([0], [0], color="k", lw=lw, linestyle="dashed", label="CORON"),
+        # ]
+        # cax.legend(
+        #     handles=legend_elements,
+        #     fontsize=10,
+        #     loc="lower right",
+        #     title="NIRCam",
+        #     title_fontsize=11,
+        # )
 
-    # cax = ax[2, 0]
-    cax = ax[2]
-    plot_spec_singleinst(cax, ["NIRISS"])
-    plot_spec_singleinst(cax, ["FGS"])
-    legend_elements = [
-        Line2D([0], [0], color="k", lw=2, linestyle="solid", label="IMAGE"),
-        Line2D([0], [0], color="k", lw=2, linestyle="dashed", label="WFSS"),
-        Line2D([0], [0], color="k", lw=2, linestyle="dotted", label="SOSS"),
-        Line2D([0], [0], color="k", lw=2, linestyle="dashdot", label="AMI"),
-    ]
-    cax.legend(
-        handles=legend_elements,
-        fontsize=10,
-        loc="lower right",
-        title="NIRISS/FGS",
-        title_fontsize=11,
-    )
+        # cax = ax[2, 1]
+        cax = ax[1]
+        plot_spec_singleinst(cax, ["NIRCAM"], modes=["WFSS", "CORON"], fontsize=fontsize)
+        legend_elements = [
+            Line2D([0], [0], color="k", lw=lw, linestyle="solid", label="WFSS"),
+            Line2D([0], [0], color="k", lw=lw, linestyle="dashed", label="CORON"),
+        ]
+        leg1 = cax.legend(
+            handles=legend_elements,
+            loc="lower right",
+            title="NIRCam WFSS & CORON",
+        )
 
-    # cax = ax[0, 1]
-    cax = ax[1]
-    plot_spec_singleinst(cax, ["NIRSPEC"])
-    legend_elements = [
-        Line2D([0], [0], color="k", lw=2, linestyle="solid", label="FixedSlit"),
-        Line2D([0], [0], color="k", lw=2, linestyle="dashed", label="IFU"),
-    ]
-    cax.legend(
-        handles=legend_elements,
-        fontsize=10,
-        loc="lower right",
-        title="NIRSpec",
-        title_fontsize=11,
-    )
+        plt.gca().add_artist(leg1)
+        legend_elements = [
+            Line2D([0], [0], color="b", lw=lw, alpha=0.25, label="WD stars"),
+            Line2D([0], [0], color="g", lw=lw, alpha=0.25, label="A stars"),
+            Line2D([0], [0], color="m", lw=lw, alpha=0.25, label="G stars"),
+        ]
+        leg2 = cax.legend(
+            handles=legend_elements,
+            loc="lower left",
+            title="Calibrators",
+        )
+        # plt.gca().add_artist(leg2)
+        # legend_elements = [
+        #     Line2D([0], [0], color="b", lw=lw, alpha=0.75, label="WD stars"),
+        #     Line2D([0], [0], color="g", lw=lw, alpha=0.75, label="A stars"),
+        #     Line2D([0], [0], color="m", lw=lw, alpha=0.75, label="G stars"),
+        # ]
+        # cax.legend(
+        #     handles=legend_elements,
+        #     fontsize=10,
+        #     loc="lower left",
+        #     title="Cycle 1",
+        #     title_fontsize=11,
+        # )
+        cax.set_xlabel(r"$\lambda$ [$\mu m$]", fontsize=fontsize)
 
-    # cax = ax[1, 1]
-    cax = ax[0]
-    plot_spec_singleinst(cax, ["MIRI"])
-    cax.set_xlim(5.0, 29.0)
-    cax.set_ylim(1e-2, 1e8)
-    legend_elements = [
-        Line2D([0], [0], color="k", lw=2, linestyle="solid", label="IMAGE"),
-        Line2D([0], [0], color="k", lw=2, linestyle="dashed", label="CORON"),
-        Line2D([0], [0], color="k", lw=2, linestyle="dotted", label="LRS"),
-        Line2D([0], [0], color="k", lw=2, linestyle="dashdot", label="MRS"),
-    ]
-    cax.legend(
-        handles=legend_elements,
-        fontsize=10,
-        loc="lower right",
-        title="MIRI",
-        title_fontsize=11,
-    )
+    elif args.fignum == "2":
 
-    # cax = ax[2, 1]
-    cax = ax[4]
-    plot_spec_singleinst(cax, ["NIRCAM"], modes=["WFSS", "CORON"])
-    legend_elements = [
-        Line2D([0], [0], color="k", lw=2, linestyle="solid", label="WFSS"),
-        Line2D([0], [0], color="k", lw=2, linestyle="dashed", label="CORON"),
-    ]
-    leg1 = cax.legend(
-        handles=legend_elements,
-        fontsize=10,
-        loc="lower right",
-        title="NIRCam",
-        title_fontsize=11,
-    )
-    plt.gca().add_artist(leg1)
-    legend_elements = [
-        Line2D([0], [0], color="b", lw=2, alpha=0.25, label="WD stars"),
-        Line2D([0], [0], color="g", lw=2, alpha=0.25, label="A stars"),
-        Line2D([0], [0], color="m", lw=2, alpha=0.25, label="G stars"),
-    ]
-    leg2 = cax.legend(
-        handles=legend_elements,
-        fontsize=10,
-        loc="upper left",
-        title="Calibrators",
-        title_fontsize=11,
-    )
-    plt.gca().add_artist(leg2)
-    legend_elements = [
-        Line2D([0], [0], color="b", lw=2, alpha=0.75, label="WD stars"),
-        Line2D([0], [0], color="g", lw=2, alpha=0.75, label="A stars"),
-        Line2D([0], [0], color="m", lw=2, alpha=0.75, label="G stars"),
-    ]
-    cax.legend(
-        handles=legend_elements,
-        fontsize=10,
-        loc="lower left",
-        title="Cycle 1",
-        title_fontsize=11,
-    )
-    cax.set_xlabel(r"$\lambda$ [$\mu m$]", fontsize=12)
+        # cax = ax[2, 0]
+        cax = ax[0]
+        plot_spec_singleinst(cax, ["NIRISS"], fontsize=fontsize, basealpha=0.125)
+        plot_spec_singleinst(cax, ["FGS"], fontsize=fontsize, basealpha=0.125)
+        legend_elements = [
+            Line2D([0], [0], color="k", lw=lw, linestyle="solid", label="IMAGE"),
+            Line2D([0], [0], color="k", lw=lw, linestyle="dashed", label="WFSS"),
+            Line2D([0], [0], color="k", lw=lw, linestyle="dotted", label="SOSS"),
+            Line2D([0], [0], color="k", lw=lw, linestyle="dashdot", label="AMI"),
+        ]
+        cax.legend(
+            handles=legend_elements,
+            loc="lower right",
+            title="NIRISS/FGS",
+        )
+
+        # cax = ax[0, 1]
+        cax = ax[1]
+        plot_spec_singleinst(cax, ["NIRSPEC"], fontsize=fontsize)
+        legend_elements = [
+            Line2D([0], [0], color="k", lw=lw, linestyle="solid", label="FixedSlit"),
+            Line2D([0], [0], color="k", lw=lw, linestyle="dashed", label="IFU"),
+        ]
+        cax.legend(
+            handles=legend_elements,
+            loc="lower right",
+            title="NIRSpec",
+        )
+
+        # cax = ax[1, 1]
+        cax = ax[2]
+        plot_spec_singleinst(cax, ["MIRI"], fontsize=fontsize)
+        cax.set_xlim(5.0, 29.0)
+        cax.set_ylim(1e-2, 1e8)
+        legend_elements = [
+            Line2D([0], [0], color="k", lw=lw, linestyle="solid", label="IMAGE"),
+            Line2D([0], [0], color="k", lw=lw, linestyle="dashed", label="CORON"),
+            Line2D([0], [0], color="k", lw=lw, linestyle="dotted", label="LRS"),
+            Line2D([0], [0], color="k", lw=lw, linestyle="dashdot", label="MRS"),
+        ]
+        leg1 = cax.legend(
+            handles=legend_elements,
+            loc="lower right",
+            title="MIRI",
+        )
+
+        plt.gca().add_artist(leg1)
+        legend_elements = [
+            Line2D([0], [0], color="b", lw=lw, alpha=0.25, label="WD stars"),
+            Line2D([0], [0], color="g", lw=lw, alpha=0.25, label="A stars"),
+            Line2D([0], [0], color="m", lw=lw, alpha=0.25, label="G stars"),
+        ]
+        leg2 = cax.legend(
+            handles=legend_elements,
+            loc="upper left",
+            title="Calibrators",
+        )
+
+        cax.set_xlabel(r"$\lambda$ [$\mu m$]", fontsize=fontsize)
 
     fig.tight_layout()
 
     # save the plot
     basename = "jwst_abscal_spec_paper"
+    if args.fignum == "1":
+        basename += "_1"
+    else:
+        basename += "_2"
     if args.astars:
         basename += "_astars"
     if args.gstars:
         basename += "_gstars"
-    if args.wdstars:
-        basename += "_wdstars"
+    if args.hotstars:
+        basename += "_hotstars"
     if args.savefig:
         fig.savefig("%s.%s" % (basename, args.savefig))
     else:
