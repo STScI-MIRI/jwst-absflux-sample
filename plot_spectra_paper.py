@@ -268,17 +268,17 @@ if __name__ == "__main__":
     if len(allstarnames) == 0:
         allstarnames = astarnames + gstarnames + wdstarnames
 
-    xsize = 15.0
-    ysize = 9.0
-    fig, ax = plt.subplots(nrows=3, ncols=2, figsize=(xsize, ysize))
+    xsize = 12.0
+    ysize = 14.0
+    fig, ax = plt.subplots(nrows=5, ncols=1, figsize=(xsize, ysize))
     # xsize = 10.0
     # ysize = 18.0
     # fig, ax = plt.subplots(nrows=6, ncols=1, figsize=(xsize, ysize))
 
     set_params(lw=1.0, fontsize=16)
 
-    cax = ax[0, 0]
-    # cax = ax[0]
+    # cax = ax[0, 0]
+    cax = ax[3]
     plot_spec_singleinst(cax, ["NIRCAM"], modes=["IMAGE"])
     cax.set_ylim(1e-4, 1e6)
     legend_elements = [
@@ -294,24 +294,25 @@ if __name__ == "__main__":
         title_fontsize=11,
     )
 
-    cax = ax[1, 0]
+    # cax = ax[1, 0]
     # cax = ax[1]
-    plot_spec_singleinst(cax, ["NIRCAM"], modes=["WFSS", "CORON"])
-    legend_elements = [
-        Line2D([0], [0], color="k", lw=2, linestyle="solid", label="WFSS"),
-        Line2D([0], [0], color="k", lw=2, linestyle="dashed", label="CORON"),
-    ]
-    cax.legend(
-        handles=legend_elements,
-        fontsize=10,
-        loc="lower right",
-        title="NIRCam",
-        title_fontsize=11,
-    )
+    # plot_spec_singleinst(cax, ["NIRCAM"], modes=["WFSS", "CORON"])
+    # legend_elements = [
+    #     Line2D([0], [0], color="k", lw=2, linestyle="solid", label="WFSS"),
+    #     Line2D([0], [0], color="k", lw=2, linestyle="dashed", label="CORON"),
+    # ]
+    # cax.legend(
+    #     handles=legend_elements,
+    #     fontsize=10,
+    #     loc="lower right",
+    #     title="NIRCam",
+    #     title_fontsize=11,
+    # )
 
-    cax = ax[2, 0]
-    # cax = ax[2]
+    # cax = ax[2, 0]
+    cax = ax[2]
     plot_spec_singleinst(cax, ["NIRISS"])
+    plot_spec_singleinst(cax, ["FGS"])
     legend_elements = [
         Line2D([0], [0], color="k", lw=2, linestyle="solid", label="IMAGE"),
         Line2D([0], [0], color="k", lw=2, linestyle="dashed", label="WFSS"),
@@ -322,13 +323,12 @@ if __name__ == "__main__":
         handles=legend_elements,
         fontsize=10,
         loc="lower right",
-        title="NIRISS",
+        title="NIRISS/FGS",
         title_fontsize=11,
     )
-    cax.set_xlabel(r"$\lambda$ [$\mu m$]", fontsize=12)
 
-    cax = ax[0, 1]
-    # cax = ax[3]
+    # cax = ax[0, 1]
+    cax = ax[1]
     plot_spec_singleinst(cax, ["NIRSPEC"])
     legend_elements = [
         Line2D([0], [0], color="k", lw=2, linestyle="solid", label="FixedSlit"),
@@ -342,8 +342,8 @@ if __name__ == "__main__":
         title_fontsize=11,
     )
 
-    cax = ax[1, 1]
-    # cax = ax[4]
+    # cax = ax[1, 1]
+    cax = ax[0]
     plot_spec_singleinst(cax, ["MIRI"])
     cax.set_xlim(5.0, 29.0)
     cax.set_ylim(1e-2, 1e8)
@@ -361,17 +361,18 @@ if __name__ == "__main__":
         title_fontsize=11,
     )
 
-    cax = ax[2, 1]
-    # cax = ax[5]
-    plot_spec_singleinst(cax, ["FGS"])
+    # cax = ax[2, 1]
+    cax = ax[4]
+    plot_spec_singleinst(cax, ["NIRCAM"], modes=["WFSS", "CORON"])
     legend_elements = [
-        Line2D([0], [0], color="k", lw=2, linestyle="solid", label="IMAGE"),
+        Line2D([0], [0], color="k", lw=2, linestyle="solid", label="WFSS"),
+        Line2D([0], [0], color="k", lw=2, linestyle="dashed", label="CORON"),
     ]
     leg1 = cax.legend(
         handles=legend_elements,
         fontsize=10,
         loc="lower right",
-        title="FGS",
+        title="NIRCam",
         title_fontsize=11,
     )
     plt.gca().add_artist(leg1)
