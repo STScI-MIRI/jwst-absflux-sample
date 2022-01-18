@@ -229,7 +229,7 @@ def plot_spec_singleinst(cax, inst, modes="all", fontsize=16, basealpha=0.25):
                         np.array([bandmax.value, bandmin.value]) * cwave.value ** 2,
                         color=ccolor,
                         linestyle=cline,
-                        linewidth=2.0,
+                        linewidth=3.0,
                     )
                     cax.text(
                         cwave.value,
@@ -238,7 +238,7 @@ def plot_spec_singleinst(cax, inst, modes="all", fontsize=16, basealpha=0.25):
                         rotation=90.0,
                         fontsize=0.6 * fontsize,
                         horizontalalignment="center",
-                        bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+                        bbox=dict(boxstyle="round", facecolor="wheat", alpha=0.5),
                     )
 
     cax.set_xscale("linear")
@@ -250,8 +250,8 @@ def plot_spec_singleinst(cax, inst, modes="all", fontsize=16, basealpha=0.25):
     # cax.set_ylabel(r"$\lambda^2 F(nu)$ [mJy $\mu m^2$]")
     # cax.legend()
 
-    cax.tick_params(axis='x', labelsize=fontsize)
-    cax.tick_params(axis='y', labelsize=fontsize)
+    cax.tick_params(axis="x", labelsize=fontsize)
+    cax.tick_params(axis="y", labelsize=fontsize)
 
 
 if __name__ == "__main__":
@@ -288,12 +288,15 @@ if __name__ == "__main__":
 
     lw = 2.5
     fontsize = 16
+    basealpha = 0.35
     set_params(lw=lw, fontsize=fontsize)
 
     if args.fignum == "1":
         # cax = ax[0, 0]
         cax = ax[0]
-        plot_spec_singleinst(cax, ["NIRCAM"], modes=["IMAGE"], fontsize=fontsize)
+        plot_spec_singleinst(
+            cax, ["NIRCAM"], modes=["IMAGE"], fontsize=fontsize, basealpha=basealpha
+        )
         cax.set_ylim(1e-4, 1e6)
         legend_elements = [
             Line2D([0], [0], color="k", lw=lw, linestyle="solid", label="WIDE"),
@@ -302,6 +305,7 @@ if __name__ == "__main__":
         ]
         cax.legend(
             handles=legend_elements,
+            handlelength=4.0,
             loc="lower right",
             title="NIRCam IMAGE",
         )
@@ -323,25 +327,57 @@ if __name__ == "__main__":
 
         # cax = ax[2, 1]
         cax = ax[1]
-        plot_spec_singleinst(cax, ["NIRCAM"], modes=["WFSS", "CORON"], fontsize=fontsize)
+        plot_spec_singleinst(
+            cax,
+            ["NIRCAM"],
+            modes=["WFSS", "CORON"],
+            fontsize=fontsize,
+            basealpha=basealpha,
+        )
         legend_elements = [
             Line2D([0], [0], color="k", lw=lw, linestyle="solid", label="WFSS"),
             Line2D([0], [0], color="k", lw=lw, linestyle="dashed", label="CORON"),
         ]
         leg1 = cax.legend(
             handles=legend_elements,
+            handlelength=4.0,
             loc="lower right",
             title="NIRCam WFSS & CORON",
         )
 
         plt.gca().add_artist(leg1)
         legend_elements = [
-            Line2D([0], [0], color="b", lw=lw, alpha=0.25, label="WD stars"),
-            Line2D([0], [0], color="g", lw=lw, alpha=0.25, label="A stars"),
-            Line2D([0], [0], color="m", lw=lw, alpha=0.25, label="G stars"),
+            Line2D(
+                [0],
+                [0],
+                color="b",
+                lw=lw,
+                linestyle="dashdot",
+                alpha=2 * basealpha,
+                label="hot stars",
+            ),
+            Line2D(
+                [0],
+                [0],
+                color="g",
+                lw=lw,
+                linestyle="solid",
+                alpha=2 * basealpha,
+                label="A dwarfs",
+            ),
+            Line2D(
+                [0],
+                [0],
+                color="m",
+                lw=lw,
+                linestyle="dotted",
+                alpha=2 * basealpha,
+                label="solar analogs",
+            ),
         ]
         leg2 = cax.legend(
             handles=legend_elements,
+            handlelength=4.0,
             loc="lower left",
             title="Calibrators",
         )
@@ -364,8 +400,10 @@ if __name__ == "__main__":
 
         # cax = ax[2, 0]
         cax = ax[0]
-        plot_spec_singleinst(cax, ["NIRISS"], fontsize=fontsize, basealpha=0.125)
-        plot_spec_singleinst(cax, ["FGS"], fontsize=fontsize, basealpha=0.125)
+        plot_spec_singleinst(
+            cax, ["NIRISS"], fontsize=fontsize, basealpha=0.5 * basealpha
+        )
+        plot_spec_singleinst(cax, ["FGS"], fontsize=fontsize, basealpha=0.5 * basealpha)
         legend_elements = [
             Line2D([0], [0], color="k", lw=lw, linestyle="solid", label="IMAGE"),
             Line2D([0], [0], color="k", lw=lw, linestyle="dashed", label="WFSS"),
@@ -374,26 +412,28 @@ if __name__ == "__main__":
         ]
         cax.legend(
             handles=legend_elements,
+            handlelength=4.0,
             loc="lower right",
             title="NIRISS/FGS",
         )
 
         # cax = ax[0, 1]
         cax = ax[1]
-        plot_spec_singleinst(cax, ["NIRSPEC"], fontsize=fontsize)
+        plot_spec_singleinst(cax, ["NIRSPEC"], fontsize=fontsize, basealpha=basealpha)
         legend_elements = [
             Line2D([0], [0], color="k", lw=lw, linestyle="solid", label="FixedSlit"),
             Line2D([0], [0], color="k", lw=lw, linestyle="dashed", label="IFU"),
         ]
         cax.legend(
             handles=legend_elements,
+            handlelength=4.0,
             loc="lower right",
             title="NIRSpec",
         )
 
         # cax = ax[1, 1]
         cax = ax[2]
-        plot_spec_singleinst(cax, ["MIRI"], fontsize=fontsize)
+        plot_spec_singleinst(cax, ["MIRI"], fontsize=fontsize, basealpha=basealpha)
         cax.set_xlim(5.0, 29.0)
         cax.set_ylim(1e-2, 1e8)
         legend_elements = [
@@ -404,18 +444,44 @@ if __name__ == "__main__":
         ]
         leg1 = cax.legend(
             handles=legend_elements,
+            handlelength=4.0,
             loc="lower right",
             title="MIRI",
         )
 
         plt.gca().add_artist(leg1)
         legend_elements = [
-            Line2D([0], [0], color="b", lw=lw, alpha=0.25, label="WD stars"),
-            Line2D([0], [0], color="g", lw=lw, alpha=0.25, label="A stars"),
-            Line2D([0], [0], color="m", lw=lw, alpha=0.25, label="G stars"),
+            Line2D(
+                [0],
+                [0],
+                color="b",
+                lw=lw,
+                linestyle="dashdot",
+                alpha=2 * basealpha,
+                label="hot stars",
+            ),
+            Line2D(
+                [0],
+                [0],
+                color="g",
+                lw=lw,
+                linestyle="solid",
+                alpha=2 * basealpha,
+                label="A dwarfs",
+            ),
+            Line2D(
+                [0],
+                [0],
+                color="m",
+                lw=lw,
+                linestyle="dotted",
+                alpha=2 * basealpha,
+                label="solar analogs",
+            ),
         ]
         leg2 = cax.legend(
             handles=legend_elements,
+            handlelength=4.0,
             loc="upper left",
             title="Calibrators",
         )
