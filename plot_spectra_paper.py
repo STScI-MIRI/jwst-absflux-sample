@@ -121,6 +121,8 @@ def plot_spec_singleinst(cax, inst, modes="all", fontsize=16, basealpha=0.25):
         "gd153",
     ]
 
+    # cycle1_stars = ['eta1dor', 'ngc2506']
+
     starfluxes = {}
     starwaves = {}
     for cname in allstarnames:
@@ -143,6 +145,7 @@ def plot_spec_singleinst(cax, inst, modes="all", fontsize=16, basealpha=0.25):
 
         alpha = basealpha
         if cname in cycle1_stars:
+            # alpha = 1.0
             alpha = basealpha
 
         cax.plot(x, (x ** 2) * flux_mJy, col, label=cname, alpha=alpha)
