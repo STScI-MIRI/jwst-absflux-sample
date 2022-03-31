@@ -443,7 +443,7 @@ if __name__ == "__main__":
             Line2D([0], [0], color="k", lw=lw, linestyle="solid", label="IMAGE"),
             Line2D([0], [0], color="k", lw=lw, linestyle="dashed", label="CORON"),
             Line2D([0], [0], color="k", lw=lw, linestyle="dotted", label="LRS"),
-            Line2D([0], [0], color="k", lw=lw, linestyle="dashdot", label="MRS"),
+            Line2D([0], [0], color="k", lw=lw, linestyle="dashdot", label="MRS IFU"),
         ]
         leg1 = cax.legend(
             handles=legend_elements,
