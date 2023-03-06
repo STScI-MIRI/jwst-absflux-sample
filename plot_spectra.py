@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function, division
-
 import glob
 import argparse
 import numpy as np
@@ -14,8 +12,8 @@ from jwst_starnames import (
     astarnames_second,
     gstarnames_prime,
     gstarnames_second,
-    wdstarnames_prime,
-    wdstarnames_second,
+    hotstarnames_prime,
+    hotstarnames_second,
 )
 
 FNU = u.erg / (u.cm ** 2 * u.s * u.Hz)
@@ -92,7 +90,7 @@ def initialize_parser():
     )
     parser.add_argument("--astars", help="Use A star models", action="store_true")
     parser.add_argument("--gstars", help="Use G star models", action="store_true")
-    parser.add_argument("--wdstars", help="Use WD star models", action="store_true")
+    parser.add_argument("--hotstars", help="Use hot star models", action="store_true")
     parser.add_argument(
         "--primeonly", action="store_true", help="Only use prime designated sources"
     )
@@ -105,9 +103,10 @@ def initialize_parser():
         "--part1", action="store_true", help="Only check the part1 limited set of modes"
     )
     parser.add_argument(
-        "--inst", default="all",
+        "--inst",
+        default="all",
         choices=["all", "NIRCAM", "NIRSPEC", "NIRISS", "FGS", "MIRI"],
-        help="Instruments to plot"
+        help="Instruments to plot",
     )
     parser.add_argument(
         "-t",
@@ -143,7 +142,10 @@ def which_observable(modewave, modemin, modemax, starnames, starwaves, starfluxe
         names of the stars that are observable in this mode
     """
     obsstars = []
+    print(starnames)
+    print(starwaves.keys())
     for cname in starnames:
+        print(cname)
         modeflux = np.interp([modewave], starwaves[cname], starfluxes[cname])
         if modemin <= modeflux <= modemax:
             obsstars.append(cname)
@@ -205,25 +207,25 @@ if __name__ == "__main__":
     if args.primeonly:
         astarnames = astarnames_prime
         gstarnames = gstarnames_prime
-        wdstarnames = wdstarnames_prime
+        hotstarnames = hotstarnames_prime
     elif args.secondonly:
         astarnames = astarnames_second
         gstarnames = gstarnames_second
-        wdstarnames = wdstarnames_second
+        hotstarnames = hotstarnames_second
     else:
         astarnames = astarnames_prime + astarnames_second
         gstarnames = gstarnames_prime + gstarnames_second
-        wdstarnames = wdstarnames_prime + wdstarnames_second
+        hotstarnames = hotstarnames_prime + hotstarnames_second
 
     allstarnames = []
     if args.astars:
         allstarnames += astarnames
     if args.gstars:
         allstarnames += gstarnames
-    if args.wdstars:
-        allstarnames += wdstarnames
+    if args.hotstars:
+        allstarnames += hotstarnames
     if len(allstarnames) == 0:
-        allstarnames = astarnames + gstarnames + wdstarnames
+        allstarnames = astarnames + gstarnames + hotstarnames
 
     target_num_obs = int(args.target_obs)
 
@@ -244,7 +246,7 @@ if __name__ == "__main__":
             col = "g"
         elif cname in gstarnames:
             col = "m"
-        elif cname in wdstarnames:
+        elif cname in hotstarnames:
             col = "b"
 
         x = ctable["WAVELENGTH"].quantity
@@ -329,12 +331,16 @@ if __name__ == "__main__":
             modeobservedstars[cur_mokey].append(sname)
         # remove the star from the possible stars list
         # sn_k, = np.where(cstarnames == sname)
-        for k in range(len(cstarnames)):
-            if sname == cstarnames[k]:
-                sn_k = k
-        del cstarnames[sn_k]
+        # for k in range(len(cstarnames)):
+        #     if sname == cstarnames[k]:
+        #         sn_k = k
+        # del cstarnames[sn_k]
+        # print("removing", sname)
+        # print(isinstance(cstarnames, list))
+        # cstarnames.remove(sname)
         del cstarwaves[sname]
         del cstarfluxes[sname]
+        cstarnames = cstarwaves.keys()
 
         # check the list of modes, remove a mode if it has the target number
         for cur_mokey in modeobserved:
@@ -419,7 +425,7 @@ if __name__ == "__main__":
         basename += "_astars"
     if args.gstars:
         basename += "_gstars"
-    if args.wdstars:
+    if args.hotstars:
         basename += "_wdstars"
     if args.part1:
         basename += "_part1"

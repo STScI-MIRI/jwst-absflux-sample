@@ -93,7 +93,7 @@ def initialize_parser():
     )
     parser.add_argument("--astars", help="Use A star models", action="store_true")
     parser.add_argument("--gstars", help="Use G star models", action="store_true")
-    parser.add_argument("--hotstars", help="Use WD star models", action="store_true")
+    parser.add_argument("--hotstars", help="Use hot star models", action="store_true")
     parser.add_argument(
         "--fignum",
         default="1",
