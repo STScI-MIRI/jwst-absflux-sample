@@ -2,9 +2,8 @@
 astarnames_prime = ['hd101452', 'hd2811', 'hd55677',
                     'bd60d1753', '1802271',  # '1812095',
                     '1743045']
-astarnames_second = ['delumi', 'hd14943', 'eta1dor',  # 'hd172728' (no STIS yet)
+astarnames_second = ['delumi', 'hd14943', 'eta1dor' 'hd172728',
                      'hd128998', 'hd158485', 'hd163466',
-                     'hd101452',
                      'hd37725', 'hd116405', 'hd180609',
                      '1757132', '1805292']  # , '1808347', '1732526']
 
