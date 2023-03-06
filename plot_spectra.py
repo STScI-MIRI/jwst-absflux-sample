@@ -9,10 +9,16 @@ from astropy import units as u
 
 from jwst_starnames import (
     astarnames_prime,
+    astarnames_prime_cycle1,
+    astarnames_part2_cycle1,
     astarnames_second,
     gstarnames_prime,
+    gstarnames_prime_cycle1,
+    gstarnames_part2_cycle1,
     gstarnames_second,
     hotstarnames_prime,
+    hotstarnames_prime_cycle1,
+    hotstarnames_part2_cycle1,
     hotstarnames_second,
 )
 
@@ -95,9 +101,19 @@ def initialize_parser():
         "--primeonly", action="store_true", help="Only use prime designated sources"
     )
     parser.add_argument(
+        "--c1primeonly",
+        action="store_true",
+        help="Only use cycle 1 prime designated sources",
+    )
+    parser.add_argument(
         "--secondonly",
         action="store_true",
         help="Only use secondary designated sources",
+    )
+    parser.add_argument(
+        "--rm_c1p2",
+        action="store_true",
+        help="remove cycle 1 part 2 from consideration",
     )
     parser.add_argument(
         "--part1", action="store_true", help="Only check the part1 limited set of modes"
@@ -142,10 +158,7 @@ def which_observable(modewave, modemin, modemax, starnames, starwaves, starfluxe
         names of the stars that are observable in this mode
     """
     obsstars = []
-    print(starnames)
-    print(starwaves.keys())
     for cname in starnames:
-        print(cname)
         modeflux = np.interp([modewave], starwaves[cname], starfluxes[cname])
         if modemin <= modeflux <= modemax:
             obsstars.append(cname)
@@ -212,6 +225,10 @@ if __name__ == "__main__":
         astarnames = astarnames_second
         gstarnames = gstarnames_second
         hotstarnames = hotstarnames_second
+    elif args.c1primeonly:
+        astarnames = astarnames_prime_cycle1
+        gstarnames = gstarnames_prime_cycle1
+        hotstarnames = hotstarnames_prime_cycle1
     else:
         astarnames = astarnames_prime + astarnames_second
         gstarnames = gstarnames_prime + gstarnames_second
@@ -227,6 +244,18 @@ if __name__ == "__main__":
     if len(allstarnames) == 0:
         allstarnames = astarnames + gstarnames + hotstarnames
 
+    if args.rm_c1p2:
+        rmnames = (
+            astarnames_part2_cycle1
+            + gstarnames_part2_cycle1
+            + hotstarnames_part2_cycle1
+        )
+        nallstarnames = []
+        for cname in allstarnames:
+            if cname not in rmnames:
+                nallstarnames.append(cname)
+        allstarnames = nallstarnames
+
     target_num_obs = int(args.target_obs)
 
     xsize = 15.0
@@ -239,6 +268,7 @@ if __name__ == "__main__":
     starwaves = {}
     for cname in allstarnames:
         cfile = glob.glob("data/%s_mod_0??.fits" % cname)
+        print(cname)
         rb_filename = cfile[0].replace(".fits", "_r3000.fits")
         ctable = Table.read(rb_filename)
 
@@ -303,8 +333,8 @@ if __name__ == "__main__":
 
         # stars to prioritize
         # fmt: off
-        priority_stars = ["p330e",
-                          "gd71",
+        priority_stars = ["p330e", "10lac", "gd71",
+                          # "gd71",
                           "1743045", "1802271", "1812095"]
         # fmt: on
         # get the starname with the most observed modes
