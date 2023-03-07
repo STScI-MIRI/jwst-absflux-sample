@@ -1,5 +1,5 @@
 # min/max sensitivities for JWST absflux observations
-# taken 20-Mar-2018 from
+# taken 7-Mar-2023 from
 # https://outerspace.stsci.edu/display/JWSTCC/AbsFlux+Instrument+Sensitivities
 #
 # wavelengths in micron, fluxes are in mJy

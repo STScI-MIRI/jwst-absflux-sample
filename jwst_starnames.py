@@ -12,7 +12,7 @@ astarnames_second = ['delumi', 'hd14943', 'eta1dor', 'hd172728',
                      '1757132', '1805292']  # , '1808347', '1732526']
 
 gstarnames_prime_cycle1 = ['p177d', 'p330e']
-gstarnames_part2_cycle1 = ['p177d', 'p330e', 'hd167060', 'ngc2506']
+gstarnames_part2_cycle1 = ['p177d', 'p330e', 'hd167060', 'ngc2506', '16cygb']
 
 gstarnames_prime = ['18sco', '16cygb', 'hd142331',
                     'hd167060', 'hd115169',
